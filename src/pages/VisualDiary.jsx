@@ -9,7 +9,7 @@ const VisualDiary = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [scannedMed, setScannedMed] = useState('');
   const navigate = useNavigate();
-  
+
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
@@ -52,19 +52,19 @@ const VisualDiary = () => {
       const formData = new FormData();
       formData.append('file', file, file.name);
       formData.append('email', user?.email || 'guest');
-      
-      const response = await fetch('http://localhost:8000/api/scan_pill', {
+
+      const response = await fetch('https://vocalmark-backend.onrender.com/api/scan_pill', {
         method: 'POST',
         body: formData,
       });
-      
+
       if (!response.ok) throw new Error('CV API failed');
       const data = await response.json();
-      
+
       setScannedMed(data.identification.medication_name);
       setIsProcessing(false);
       setIsComplete(true);
-      
+
     } catch (err) {
       console.error("Falling back to local simulation:", err);
       setTimeout(() => {
@@ -77,35 +77,35 @@ const VisualDiary = () => {
 
   const handleCapture = async () => {
     if (!videoRef.current) return;
-    
+
     // Extract snapshot from video stream
     const canvas = document.createElement('canvas');
     canvas.width = videoRef.current.videoWidth || 640;
     canvas.height = videoRef.current.videoHeight || 480;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    
+
     stopCamera();
     setIsProcessing(true);
-    
+
     canvas.toBlob(async (blob) => {
       try {
         const formData = new FormData();
         formData.append('file', blob, 'pill_scan.jpg');
         formData.append('email', user?.email || 'guest');
-        
-        const response = await fetch('http://localhost:8000/api/scan_pill', {
+
+        const response = await fetch('https://vocalmark-backend.onrender.com/api/scan_pill', {
           method: 'POST',
           body: formData,
         });
-        
+
         if (!response.ok) throw new Error('CV API failed');
         const data = await response.json();
-        
+
         setScannedMed(data.identification.medication_name);
         setIsProcessing(false);
         setIsComplete(true);
-        
+
       } catch (err) {
         console.error("Falling back to local simulation:", err);
         setTimeout(() => {
@@ -150,11 +150,11 @@ const VisualDiary = () => {
             ) : (
               // Scanner Overlay effect
               <>
-                <video 
-                  ref={setVideoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
+                <video
+                  ref={setVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
                 <div style={{
@@ -186,11 +186,11 @@ const VisualDiary = () => {
               <label className="btn btn-outline" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Upload size={18} />
                 <span>Upload Medication Photo</span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleFileUpload} 
-                  style={{ display: 'none' }} 
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
                 />
               </label>
             </div>
@@ -223,7 +223,7 @@ const VisualDiary = () => {
             <CheckCircle2 size={64} />
           </div>
           <h2 style={{ marginBottom: '1rem' }}>Medication Logged!</h2>
-          
+
           <div style={{ background: '#D1FAE5', color: '#065F46', padding: '1rem 2rem', borderRadius: '12px', marginBottom: '2rem', display: 'inline-flex', alignItems: 'center', gap: '0.75rem', fontWeight: 600 }}>
             <Pill size={24} /> {scannedMed}
           </div>
@@ -231,9 +231,9 @@ const VisualDiary = () => {
           <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', maxWidth: '400px' }}>
             Successfully identified and recorded. Your daily medication adherence log has been securely updated.
           </p>
-          
+
           <div style={{ display: 'flex', gap: '1rem' }}>
-             <button className="btn btn-outline" onClick={() => {
+            <button className="btn btn-outline" onClick={() => {
               setIsComplete(false);
               startCamera();
             }}>

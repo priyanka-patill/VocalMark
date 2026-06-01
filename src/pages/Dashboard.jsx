@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area 
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
 import { Activity, Wind, Waves, AlertTriangle, CheckCircle2, Trash2, Plus, Battery, MessageSquare } from 'lucide-react';
 import { useOutletContext, Link } from 'react-router-dom';
@@ -28,12 +28,13 @@ const Dashboard = () => {
   const [prescriptions, setPrescriptions] = useState([]);
   const [showAddRx, setShowAddRx] = useState(false);
   const [newRx, setNewRx] = useState({ name: '', duration: 30 });
+
   const fetchDashboard = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/dashboard/${user?.email || 'guest'}`);
+      const res = await fetch(`https://vocalmark-backend.onrender.com/api/dashboard/${user?.email || 'guest'}`);
       if (!res.ok) throw new Error("Failed to fetch dashboard");
       const data = await res.json();
-      
+
       if (data.history && data.history.length > 0) {
         setChartData(data.history);
         const lastEntry = data.history[data.history.length - 1];
@@ -54,7 +55,7 @@ const Dashboard = () => {
           status: "No Logs"
         });
       }
-      
+
       if (data.prescriptions) {
         setPrescriptions(data.prescriptions);
       }
@@ -77,13 +78,11 @@ const Dashboard = () => {
 
   // Automated Patient Condition Monitor (Background Task)
   useEffect(() => {
-    // If external sensors or trackers push the patient into 'Warning' status locally or externally,
-    // immediately intercept it and fire an automated alert!
     if (currentMetrics.status === 'Warning') {
       const fd = new FormData();
       fd.append('email', user?.email || 'guest');
       fd.append('reason', 'Automated Health Plunge Detected');
-      fetch('http://localhost:8000/api/alert', { method: 'POST', body: fd }).catch(() => {});
+      fetch('https://vocalmark-backend.onrender.com/api/alert', { method: 'POST', body: fd }).catch(() => { });
     }
   }, [currentMetrics.status, user]);
 
@@ -95,13 +94,12 @@ const Dashboard = () => {
       fluency: 62,
       status: 'Warning'
     });
-    // Add artificial data plunge to chart
     setChartData(prev => [...prev, { day: 'Live', tremor: 26.5, breathlessness: 28.2 }]);
   };
 
   const handleDeleteRx = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/prescriptions/${id}`, { method: 'DELETE' });
+      const res = await fetch(`https://vocalmark-backend.onrender.com/api/prescriptions/${id}`, { method: 'DELETE' });
       if (res.ok) fetchDashboard();
     } catch (err) {
       console.error("Failed to delete Rx", err);
@@ -116,7 +114,7 @@ const Dashboard = () => {
         medication_name: newRx.name,
         duration_days: parseInt(newRx.duration) || 30
       };
-      const res = await fetch('http://localhost:8000/api/prescriptions', {
+      const res = await fetch('https://vocalmark-backend.onrender.com/api/prescriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -143,7 +141,7 @@ const Dashboard = () => {
             <Waves size={28} />
           </div>
         </div>
-        
+
         <div className="glass-card stat-card" style={{ padding: '1.5rem', border: currentMetrics.breathlessness && currentMetrics.breathlessness > 18 ? '1px solid rgba(245, 158, 11, 0.3)' : undefined }}>
           <div className="stat-info">
             <div className="label" style={{ fontSize: '1rem', color: currentMetrics.breathlessness && currentMetrics.breathlessness > 18 ? '#f59e0b' : undefined }}>Breathlessness</div>
@@ -177,19 +175,17 @@ const Dashboard = () => {
         <div className="glass-card stat-card" style={{ padding: '1.5rem' }}>
           <div className="stat-info">
             <div className="label" style={{ fontSize: '1rem' }}>Overall Status</div>
-            <div className="value" style={{color: currentMetrics.status === 'Warning' ? 'var(--accent)' : (currentMetrics.status === 'Stable' ? 'var(--secondary)' : 'var(--text-muted)'), fontSize: '2rem', marginTop: '0.8rem'}}>
+            <div className="value" style={{ color: currentMetrics.status === 'Warning' ? 'var(--accent)' : (currentMetrics.status === 'Stable' ? 'var(--secondary)' : 'var(--text-muted)'), fontSize: '2rem', marginTop: '0.8rem' }}>
               {currentMetrics.status}
             </div>
-            
             {currentMetrics.status === 'Stable' && (
-               <button 
-                 onClick={triggerCrisisMode} 
-                 style={{ marginTop: '1rem', background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}
-               >
-                 Simulate Crisis
-               </button>
+              <button
+                onClick={triggerCrisisMode}
+                style={{ marginTop: '1rem', background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}
+              >
+                Simulate Crisis
+              </button>
             )}
-            
           </div>
           <div className={`stat-icon ${currentMetrics.status === 'Warning' ? 'icon-red' : (currentMetrics.status === 'Stable' ? 'icon-green' : 'icon-blue')}`} style={{ width: '56px', height: '56px' }}>
             {currentMetrics.status === 'Warning' ? <Activity size={28} /> : (currentMetrics.status === 'Stable' ? <CheckCircle2 size={28} /> : <Activity size={28} />)}
@@ -211,18 +207,18 @@ const Dashboard = () => {
                 <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorTremor" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={currentMetrics.status === 'Warning' ? '#ef4444' : '#4F46E5'} stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor={currentMetrics.status === 'Warning' ? '#ef4444' : '#4F46E5'} stopOpacity={0}/>
+                      <stop offset="5%" stopColor={currentMetrics.status === 'Warning' ? '#ef4444' : '#4F46E5'} stopOpacity={0.8} />
+                      <stop offset="95%" stopColor={currentMetrics.status === 'Warning' ? '#ef4444' : '#4F46E5'} stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorBreath" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={currentMetrics.status === 'Warning' ? '#f59e0b' : '#10B981'} stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor={currentMetrics.status === 'Warning' ? '#f59e0b' : '#10B981'} stopOpacity={0}/>
+                      <stop offset="5%" stopColor={currentMetrics.status === 'Warning' ? '#f59e0b' : '#10B981'} stopOpacity={0.8} />
+                      <stop offset="95%" stopColor={currentMetrics.status === 'Warning' ? '#f59e0b' : '#10B981'} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="day" axisLine={false} tickLine={false} />
                   <YAxis axisLine={false} tickLine={false} />
                   <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                   />
                   <Area type="monotone" dataKey="tremor" stroke={currentMetrics.status === 'Warning' ? '#ef4444' : '#4F46E5'} fillOpacity={1} fill="url(#colorTremor)" />
@@ -231,14 +227,14 @@ const Dashboard = () => {
               </ResponsiveContainer>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', gap: '1rem', color: 'var(--text-muted)' }}>
-                 <Activity size={48} style={{ opacity: 0.5 }} />
-                 <span style={{ fontSize: '1.1rem', fontWeight: 500 }}>No vocal biomarker data logged yet</span>
-                 <p style={{ fontSize: '0.9rem', maxWidth: '320px', textAlign: 'center', opacity: 0.8 }}>
-                   Complete your first daily voice check-in to begin tracking your biomarker progression.
-                 </p>
-                 <Link to="/diary" className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem', marginTop: '0.5rem', textDecoration: 'none' }}>
-                   Go to Voice Diary
-                 </Link>
+                <Activity size={48} style={{ opacity: 0.5 }} />
+                <span style={{ fontSize: '1.1rem', fontWeight: 500 }}>No vocal biomarker data logged yet</span>
+                <p style={{ fontSize: '0.9rem', maxWidth: '320px', textAlign: 'center', opacity: 0.8 }}>
+                  Complete your first daily voice check-in to begin tracking your biomarker progression.
+                </p>
+                <Link to="/diary" className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.95rem', marginTop: '0.5rem', textDecoration: 'none' }}>
+                  Go to Voice Diary
+                </Link>
               </div>
             )}
           </div>
@@ -252,9 +248,9 @@ const Dashboard = () => {
             {(() => {
               if (currentMetrics.tremor === null) {
                 return (
-                  <div style={{ 
-                    display: 'flex', gap: '1.25rem', padding: '1.5rem', 
-                    background: '#ffffff', border: '1px solid rgba(0,0,0,0.05)', 
+                  <div style={{
+                    display: 'flex', gap: '1.25rem', padding: '1.5rem',
+                    background: '#ffffff', border: '1px solid rgba(0,0,0,0.05)',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                     borderRadius: '16px', alignItems: 'center', justifyContent: 'center',
                     flexDirection: 'column', textAlign: 'center', flex: 1
@@ -296,7 +292,7 @@ const Dashboard = () => {
                   title: 'Energy Levels Optimal', desc: `No significant vocal fatigue detected (${currentMetrics.fatigue}%).`
                 });
               }
-              
+
               if (currentMetrics.fluency < 75) {
                 alerts.push({
                   type: 'warning', icon: <MessageSquare size={24} />, bg: '#FEF3C7', color: '#D97706',
@@ -342,9 +338,9 @@ const Dashboard = () => {
               const sorted = alerts.sort((a, b) => w[b.type] - w[a.type]).slice(0, 4);
 
               return sorted.map((alert, i) => (
-                <div key={i} style={{ 
-                  display: 'flex', gap: '1.25rem', padding: '1.5rem', 
-                  background: '#ffffff', border: '1px solid rgba(0,0,0,0.05)', 
+                <div key={i} style={{
+                  display: 'flex', gap: '1.25rem', padding: '1.5rem',
+                  background: '#ffffff', border: '1px solid rgba(0,0,0,0.05)',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                   borderRadius: '16px', alignItems: 'center'
                 }}>
@@ -358,7 +354,7 @@ const Dashboard = () => {
                 </div>
               ));
             })()}
-            
+
             <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem', justifyContent: 'center' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', animation: 'pulse 2s infinite' }}></div>
               Always-On Diagnostic Monitoring Active
@@ -367,7 +363,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* NEW: Medication Refill Reminders */}
       <div className="charts-grid" style={{ marginTop: '2rem' }}>
         <div className="glass-card" style={{ gridColumn: '1 / -1' }}>
           <div className="chart-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -378,17 +373,17 @@ const Dashboard = () => {
               <Plus size={16} /> Add Medication
             </button>
           </div>
-          
+
           {showAddRx && (
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border)', marginBottom: '1.5rem', marginTop: '1rem' }}>
               <form onSubmit={handleAddRx} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
                 <div style={{ flex: 2 }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Medication Name</label>
-                  <input type="text" required placeholder="e.g. Lisinopril (10mg)" value={newRx.name} onChange={e => setNewRx({...newRx, name: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-dark)', color: 'white' }} />
+                  <input type="text" required placeholder="e.g. Lisinopril (10mg)" value={newRx.name} onChange={e => setNewRx({ ...newRx, name: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-dark)', color: 'white' }} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Duration (Days)</label>
-                  <input type="number" required min="1" max="180" value={newRx.duration} onChange={e => setNewRx({...newRx, duration: e.target.value})} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-dark)', color: 'white' }} />
+                  <input type="number" required min="1" max="180" value={newRx.duration} onChange={e => setNewRx({ ...newRx, duration: e.target.value })} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-dark)', color: 'white' }} />
                 </div>
                 <div>
                   <button type="submit" className="btn btn-primary" style={{ padding: '0.75rem 1.5rem', height: '100%' }}>Save</button>
@@ -404,52 +399,52 @@ const Dashboard = () => {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
               {prescriptions.map(med => {
-              const daysLeft = med.durationDays - med.daysElapsed;
-              const isEndingSoon = daysLeft <= 5 && daysLeft > 0;
-              const isUrgent = daysLeft <= 2;
-              const progressPercent = (med.daysElapsed / med.durationDays) * 100;
-              
-              const accentColor = isUrgent ? '#ef4444' : (isEndingSoon ? '#f59e0b' : 'var(--primary)');
-              const bgColor = isUrgent ? 'rgba(239, 68, 68, 0.1)' : (isEndingSoon ? 'rgba(245, 158, 11, 0.1)' : 'rgba(255,255,255,0.02)');
-              const borderColor = isUrgent ? 'rgba(239, 68, 68, 0.3)' : (isEndingSoon ? 'rgba(245, 158, 11, 0.3)' : 'var(--border)');
+                const daysLeft = med.durationDays - med.daysElapsed;
+                const isEndingSoon = daysLeft <= 5 && daysLeft > 0;
+                const isUrgent = daysLeft <= 2;
+                const progressPercent = (med.daysElapsed / med.durationDays) * 100;
 
-              return (
-                <div key={med.id} style={{ padding: '1.5rem', background: bgColor, borderRadius: '12px', border: `1px solid ${borderColor}`, position: 'relative' }}>
-                  <button 
-                    onClick={() => handleDeleteRx(med.id)}
-                    style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', borderRadius: '50%' }}
-                    title="Remove Prescription"
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingRight: '2rem' }}>
-                    <h4 style={{ fontSize: '1.2rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      {med.name}
-                      {isEndingSoon && (
-                        <span className="badge" style={{background: isUrgent ? '#fee2e2' : '#fef3c7', color: accentColor}}>
-                           Reminder
-                        </span>
-                      )}
-                    </h4>
-                    <div style={{ fontWeight: 600, color: isEndingSoon ? accentColor : 'var(--text)' }}>
-                      {daysLeft} Days Remaining
+                const accentColor = isUrgent ? '#ef4444' : (isEndingSoon ? '#f59e0b' : 'var(--primary)');
+                const bgColor = isUrgent ? 'rgba(239, 68, 68, 0.1)' : (isEndingSoon ? 'rgba(245, 158, 11, 0.1)' : 'rgba(255,255,255,0.02)');
+                const borderColor = isUrgent ? 'rgba(239, 68, 68, 0.3)' : (isEndingSoon ? 'rgba(245, 158, 11, 0.3)' : 'var(--border)');
+
+                return (
+                  <div key={med.id} style={{ padding: '1.5rem', background: bgColor, borderRadius: '12px', border: `1px solid ${borderColor}`, position: 'relative' }}>
+                    <button
+                      onClick={() => handleDeleteRx(med.id)}
+                      style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', borderRadius: '50%' }}
+                      title="Remove Prescription"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingRight: '2rem' }}>
+                      <h4 style={{ fontSize: '1.2rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        {med.name}
+                        {isEndingSoon && (
+                          <span className="badge" style={{ background: isUrgent ? '#fee2e2' : '#fef3c7', color: accentColor }}>
+                            Reminder
+                          </span>
+                        )}
+                      </h4>
+                      <div style={{ fontWeight: 600, color: isEndingSoon ? accentColor : 'var(--text)' }}>
+                        {daysLeft} Days Remaining
+                      </div>
+                    </div>
+
+                    {isEndingSoon && (
+                      <div style={{ color: accentColor, marginBottom: '1rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <AlertTriangle size={18} />
+                        Your {med.durationDays}-day supply ends in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}! Please contact your doctor for a refill.
+                      </div>
+                    )}
+
+                    <div style={{ width: '100%', height: '8px', background: 'var(--border)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: `${progressPercent}%`, height: '100%', background: accentColor, transition: 'width 1s ease-in-out' }}></div>
                     </div>
                   </div>
-                  
-                  {isEndingSoon && (
-                    <div style={{ color: accentColor, marginBottom: '1rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <AlertTriangle size={18} />
-                      Your {med.durationDays}-day supply ends in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}! Please contact your doctor for a refill.
-                    </div>
-                  )}
-
-                  <div style={{ width: '100%', height: '8px', background: 'var(--border)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${progressPercent}%`, height: '100%', background: accentColor, transition: 'width 1s ease-in-out' }}></div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>

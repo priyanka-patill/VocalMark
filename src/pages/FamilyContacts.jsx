@@ -19,7 +19,7 @@ const FamilyContacts = () => {
   useEffect(() => {
     let timerId;
     const resetTimer = () => setInactivityTimer(20);
-    
+
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('keydown', resetTimer);
     window.addEventListener('click', resetTimer);
@@ -45,7 +45,7 @@ const FamilyContacts = () => {
 
   const fetchContacts = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/family/${user?.email || 'guest'}`);
+      const res = await fetch(`https://vocalmark-backend.onrender.com/api/family/${user?.email || 'guest'}`);
       if (res.ok) {
         const data = await res.json();
         setContacts(data.family || []);
@@ -59,7 +59,7 @@ const FamilyContacts = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch('http://localhost:8000/api/family', {
+      const res = await fetch('https://vocalmark-backend.onrender.com/api/family', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -87,8 +87,8 @@ const FamilyContacts = () => {
       const fd = new FormData();
       fd.append('email', user?.email || 'guest');
       fd.append('reason', isAuto ? 'Automated Inactivity Alert (Patient Unresponsive for 20s)' : 'Manual Emergency Override');
-      
-      const res = await fetch('http://localhost:8000/api/alert', {
+
+      const res = await fetch('https://vocalmark-backend.onrender.com/api/alert', {
         method: 'POST',
         body: fd
       });
@@ -108,7 +108,7 @@ const FamilyContacts = () => {
 
   const handleDeleteContact = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/family/${id}`, {
+      const res = await fetch(`https://vocalmark-backend.onrender.com/api/family/${id}`, {
         method: 'DELETE'
       });
       if (res.ok) fetchContacts();
@@ -119,7 +119,7 @@ const FamilyContacts = () => {
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      
+
       <div className="glass-card" style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 style={{ fontSize: '1.8rem', display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
@@ -143,33 +143,33 @@ const FamilyContacts = () => {
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '1.1rem' }}>Full Name</label>
                 <div className="input-wrapper" style={{ position: 'relative' }}>
                   <User size={20} className="input-icon" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                  <input required type="text" placeholder="John Doe" 
-                         value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
-                         style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--text)' }} />
+                  <input required type="text" placeholder="John Doe"
+                    value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--text)' }} />
                 </div>
               </div>
-              
+
               <div className="input-group">
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '1.1rem' }}>Relationship</label>
                 <div className="input-wrapper" style={{ position: 'relative' }}>
                   <Heart size={20} className="input-icon" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                  <input required type="text" placeholder="e.g. Daughter" 
-                         value={formData.relationship} onChange={e => setFormData({...formData, relationship: e.target.value})}
-                         style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--text)' }} />
+                  <input required type="text" placeholder="e.g. Daughter"
+                    value={formData.relationship} onChange={e => setFormData({ ...formData, relationship: e.target.value })}
+                    style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--text)' }} />
                 </div>
               </div>
             </div>
-            
+
             <div className="input-group">
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '1.1rem' }}>Phone Number</label>
               <div className="input-wrapper" style={{ position: 'relative' }}>
                 <Phone size={20} className="input-icon" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                <input required type="tel" placeholder="e.g. 555-1234 (For SMS Alerts)" 
-                       value={formData.contact} onChange={e => setFormData({...formData, contact: e.target.value})}
-                       style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--text)' }} />
+                <input required type="tel" placeholder="e.g. 555-1234 (For SMS Alerts)"
+                  value={formData.contact} onChange={e => setFormData({ ...formData, contact: e.target.value })}
+                  style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', fontSize: '1.2rem', borderRadius: '12px', border: '1px solid var(--border)', background: 'rgba(255,255,255,0.03)', color: 'var(--text)' }} />
               </div>
             </div>
-            
+
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
               <button type="button" className="btn btn-outline" onClick={() => setShowAddForm(false)} style={{ fontSize: '1.2rem', padding: '0.8rem 1.5rem' }}>Cancel</button>
               <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ fontSize: '1.2rem', padding: '0.8rem 1.5rem' }}>
@@ -190,7 +190,7 @@ const FamilyContacts = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
           {contacts.map((c, i) => (
             <div key={i} className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', position: 'relative' }}>
-              <button 
+              <button
                 onClick={() => handleDeleteContact(c.id)}
                 style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', borderRadius: '50%' }}
                 title="Remove Contact"
@@ -215,10 +215,10 @@ const FamilyContacts = () => {
           ))}
         </div>
       )}
-      
+
       {/* Automated Emergency Trigger */}
-      <div className="glass-card" style={{ 
-        marginTop: '2rem', padding: '2rem', border: '1px solid #ef4444', 
+      <div className="glass-card" style={{
+        marginTop: '2rem', padding: '2rem', border: '1px solid #ef4444',
         background: inactivityTimer <= 5 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.3s ease'
       }}>
         <div>
@@ -232,20 +232,20 @@ const FamilyContacts = () => {
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-          <button 
-            className="btn" 
+          <button
+            className="btn"
             style={{ background: '#ef4444', color: 'white', padding: '1rem 2rem', fontSize: '1.1rem' }}
             onClick={() => triggerEmergencyDispatch(false)}
             disabled={alertStatus === 'dispatching'}
           >
             {alertStatus === 'dispatching' ? 'Dispatching...' : 'Override & Send Now'}
           </button>
-          
+
           {alertStatus === 'sent' && <span style={{ color: '#10b981', fontWeight: 600 }}>✅ Alerts dispatched successfully!</span>}
           {alertStatus === 'error' && <span style={{ color: '#ef4444', fontWeight: 600 }}>❌ Add contacts before alerting!</span>}
         </div>
       </div>
-      
+
     </div>
   );
 };

@@ -10,7 +10,7 @@ const VoiceDiary = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [alertTriggered, setAlertTriggered] = useState(false);
   const navigate = useNavigate();
-  
+
   const audioContextRef = useRef(null);
   const processorRef = useRef(null);
   const streamRef = useRef(null);
@@ -74,22 +74,22 @@ const VoiceDiary = () => {
     if (isRecording) {
       clearInterval(timerRef.current);
       setIsRecording(false);
-      
+
       if (processorRef.current) {
         processorRef.current.disconnect();
         processorRef.current = null;
       }
-      
+
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
         streamRef.current = null;
       }
-      
+
       if (audioContextRef.current) {
         const sampleRate = audioContextRef.current.sampleRate;
         audioContextRef.current.close();
         audioContextRef.current = null;
-        
+
         handleProcessAudio(leftChannelRef.current, sampleRate);
       }
     }
@@ -108,22 +108,22 @@ const VoiceDiary = () => {
         result.set(chunks[i], offset);
         offset += chunks[i].length;
       }
-      
+
       const audioBlob = bufferToWav(result, sampleRate);
       const formData = new FormData();
       formData.append('file', audioBlob, 'recording.wav');
       formData.append('email', user?.email || 'guest');
 
       // Send to real Python Backend API
-      const response = await fetch('http://localhost:8000/api/analyze', {
+      const response = await fetch('https://vocalmark-backend.onrender.com/api/analyze', {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) throw new Error('Failed to process audio');
-      
+
       const data = await response.json();
-      
+
       // Save the freshly generated metrics to dynamically update the dashboard!
       localStorage.setItem('latestMetrics', JSON.stringify({
         tremor: data.analysis.tremor_index,
@@ -134,7 +134,7 @@ const VoiceDiary = () => {
 
       // Trigger automatic automation UI if Unstable!
       if (data.analysis.alert_level === "Warning") {
-         setAlertTriggered(true);
+        setAlertTriggered(true);
       }
 
       setIsProcessing(false);
@@ -158,7 +158,7 @@ const VoiceDiary = () => {
 
   return (
     <div className="glass-card" style={{ maxWidth: '800px', margin: '0 auto', padding: '3rem' }}>
-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+      <div style={{ textAling: 'center', marginBottom: '2rem' }}>
         <h2>Daily Voice Check-in</h2>
         <p style={{ color: 'var(--text-muted)' }}>
           Please speak naturally for 15 seconds. Describe how you are feeling today or read the provided prompt.
@@ -168,24 +168,24 @@ const VoiceDiary = () => {
       {!isProcessing && !isComplete && (
         <div className="recorder-container">
           <div className="timer">00:{timeRemaining.toString().padStart(2, '0')}</div>
-          
+
           <div className={`visualizer ${isRecording ? 'active' : ''}`}>
-             {[...Array(12)].map((_, i) => (
-                <div 
-                  key={i} 
-                  className={`bar ${isRecording ? 'recording' : ''}`}
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                />
-             ))}
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className={`bar ${isRecording ? 'recording' : ''}`}
+                style={{ animationDelay: `${i * 0.1}s` }}
+              />
+            ))}
           </div>
 
-          <button 
+          <button
             className={`mic-button ${isRecording ? 'recording' : ''}`}
             onClick={isRecording ? stopRecording : handleStartRecording}
           >
             {isRecording ? <Square size={32} /> : <Mic size={32} />}
           </button>
-          
+
           <div className="recording-status">
             {isRecording ? 'Recording in progress...' : 'Tap to start recording'}
           </div>
@@ -211,7 +211,7 @@ const VoiceDiary = () => {
           <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', maxWidth: '400px' }}>
             Your vital vocal biomarkers have been securely recorded and analyzed. Your doctor will be alerted if any anomalies are detected.
           </p>
-          
+
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button className="btn btn-outline" onClick={() => {
               setIsComplete(false);
@@ -233,10 +233,10 @@ const VoiceDiary = () => {
           </div>
           <h2 style={{ marginBottom: '1rem', color: '#ef4444' }}>UNSTABLE BIOMARKERS DETECTED</h2>
           <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', padding: '1rem', borderRadius: '8px', marginBottom: '2rem', maxWidth: '450px' }}>
-             <p style={{ color: '#b91c1c', fontWeight: 600, marginBottom: '0.25rem' }}>AUTOMATED S.O.S TRIGGERED</p>
-             <p style={{ color: '#991b1b', fontSize: '0.95rem' }}>The system has automatically dispatched an emergency SMS alert to all registered family members.</p>
+            <p style={{ color: '#b91c1c', fontWeight: 600, marginBottom: '0.25rem' }}>AUTOMATED S.O.S TRIGGERED</p>
+            <p style={{ color: '#991b1b', fontSize: '0.95rem' }}>The system has automatically dispatched an emergency SMS alert to all registered family members.</p>
           </div>
-          
+
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button className="btn btn-outline" onClick={() => {
               setIsComplete(false);

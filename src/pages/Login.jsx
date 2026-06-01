@@ -11,7 +11,7 @@ const Login = ({ onLogin }) => {
     email: '',
     password: ''
   });
-  
+
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ const Login = ({ onLogin }) => {
 
   const validateForm = () => {
     const { name, age, contact, email, password } = formData;
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address.");
@@ -31,7 +31,7 @@ const Login = ({ onLogin }) => {
       setError("Password must be at least 6 characters.");
       return false;
     }
-    
+
     if (!isLoginMode) {
       if (!name || !age || !contact) {
         setError("All fields are required to register your medical profile.");
@@ -42,7 +42,7 @@ const Login = ({ onLogin }) => {
         return false;
       }
     }
-    
+
     setError("");
     return true;
   };
@@ -53,7 +53,7 @@ const Login = ({ onLogin }) => {
 
     try {
       if (isLoginMode) {
-        const response = await fetch('http://localhost:8000/api/login', {
+        const response = await fetch('https://vocalmark-backend.onrender.com/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: formData.email, password: formData.password })
@@ -63,7 +63,7 @@ const Login = ({ onLogin }) => {
         onLogin(data.user);
         navigate('/dashboard');
       } else {
-        const response = await fetch('http://localhost:8000/api/register', {
+        const response = await fetch('https://vocalmark-backend.onrender.com/api/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
@@ -85,17 +85,17 @@ const Login = ({ onLogin }) => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: 'var(--bg-main)' }}>
-      
+
       {/* LEFT SIDE: Premium Hero Section to fill empty space */}
-      <div 
-        className="login-hero" 
-        style={{ 
-          flex: '1.2', 
-          background: 'linear-gradient(135deg, var(--primary) 0%, #1e1b4b 100%)', 
-          color: 'white', 
-          padding: '4rem 6rem', 
-          display: 'flex', 
-          flexDirection: 'column', 
+      <div
+        className="login-hero"
+        style={{
+          flex: '1.2',
+          background: 'linear-gradient(135deg, var(--primary) 0%, #1e1b4b 100%)',
+          color: 'white',
+          padding: '4rem 6rem',
+          display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'center',
           position: 'relative',
           overflow: 'hidden'
@@ -114,13 +114,13 @@ const Login = ({ onLogin }) => {
           </div>
 
           <h1 style={{ fontSize: '4.5rem', marginBottom: '1.5rem', fontWeight: 800, lineHeight: 1.1, letterSpacing: '-1px' }}>
-            AI-Powered Voice<br/>Biomarker Analysis
+            AI-Powered Voice<br />Biomarker Analysis
           </h1>
-          
+
           <p style={{ fontSize: '1.5rem', opacity: 0.9, marginBottom: '3.5rem', lineHeight: 1.6 }}>
             We track microscopic changes in your vocal patterns to provide continuous health monitoring between scheduled clinical visits.
           </p>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '14px' }}><Brain size={32} color="#a5b4fc" /></div>
@@ -129,7 +129,7 @@ const Login = ({ onLogin }) => {
                 <p style={{ opacity: 0.7, fontSize: '1.15rem' }}>Early detection of Parkinson's and post-stroke tremors.</p>
               </div>
             </div>
-            
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '14px' }}><Wind size={32} color="#86efac" /></div>
               <div>
@@ -150,12 +150,12 @@ const Login = ({ onLogin }) => {
       </div>
 
       {/* RIGHT SIDE: The Login Form */}
-      <div 
-        style={{ 
-          flex: '1', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
+      <div
+        style={{
+          flex: '1',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           padding: '2rem',
           position: 'relative'
         }}
@@ -179,17 +179,17 @@ const Login = ({ onLogin }) => {
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className={isLoginMode ? '' : 'form-grid'} style={{ display: isLoginMode ? 'flex' : 'grid', flexDirection: 'column', gap: '1.5rem', gridTemplateColumns: isLoginMode ? '1fr' : '1fr 1fr' }}>
-              
+
               {!isLoginMode && (
                 <>
                   <div className="input-group">
                     <label>Full Name</label>
                     <div className="input-wrapper">
                       <User size={20} className="input-icon" />
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         name="name"
-                        placeholder="John Doe" 
+                        placeholder="John Doe"
                         value={formData.name}
                         onChange={handleChange}
                       />
@@ -200,10 +200,10 @@ const Login = ({ onLogin }) => {
                     <label>Age</label>
                     <div className="input-wrapper">
                       <Calendar size={20} className="input-icon" />
-                      <input 
+                      <input
                         type="number"
-                        name="age" 
-                        placeholder="35" 
+                        name="age"
+                        placeholder="35"
                         value={formData.age}
                         onChange={handleChange}
                       />
@@ -214,10 +214,10 @@ const Login = ({ onLogin }) => {
                     <label>Contact Number</label>
                     <div className="input-wrapper">
                       <Phone size={20} className="input-icon" />
-                      <input 
+                      <input
                         type="tel"
-                        name="contact" 
-                        placeholder="+1 (555) 000-0000" 
+                        name="contact"
+                        placeholder="+1 (555) 000-0000"
                         value={formData.contact}
                         onChange={handleChange}
                       />
@@ -230,24 +230,24 @@ const Login = ({ onLogin }) => {
                 <label>Email Address</label>
                 <div className="input-wrapper">
                   <Mail size={20} className="input-icon" />
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     name="email"
-                    placeholder="patient@example.com" 
+                    placeholder="patient@example.com"
                     value={formData.email}
                     onChange={handleChange}
                   />
                 </div>
               </div>
-              
+
               <div className="input-group" style={{ gridColumn: '1 / -1' }}>
                 <label>Password</label>
                 <div className="input-wrapper">
                   <Lock size={20} className="input-icon" />
-                  <input 
+                  <input
                     type="password"
-                    name="password" 
-                    placeholder="••••••••" 
+                    name="password"
+                    placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
                   />
@@ -259,7 +259,7 @@ const Login = ({ onLogin }) => {
               {isLoginMode ? "Sign In" : "Create Profile & Sign In"}
             </button>
           </form>
-          
+
           <div style={{ textAlign: 'center', marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem', fontSize: '1.25rem' }}>
             <div style={{ width: '100%', height: '1px', background: 'var(--border)', margin: '1rem 0' }}></div>
             {isLoginMode ? (
@@ -274,9 +274,10 @@ const Login = ({ onLogin }) => {
           </div>
         </div>
       </div>
-      
+
       {/* Specific CSS overrides for this component to ensure perfect split layout rendering on small screens */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media (max-width: 900px) {
           .login-hero { display: none !important; }
         }
